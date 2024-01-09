@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import time
 
 import jax.numpy as jnp
@@ -94,6 +95,11 @@ def gen_data(key):
 
 
 if __name__ == "__main__":
+    if not os.path.isdir("./data"):
+        os.makedirs("./data")
+    if not os.path.isdir("./plots"):
+        os.makedirs("./plots")
+
     key, gt_key, mc_key, ph_key, as_key = random.split(key, 5)
     gt_lssa = ls_spa.LSSPA(gt_key, p, 'argsort', BATCH_SIZE_GT)
     mc_lssa = ls_spa.LSSPA(mc_key, p, batch_size=BATCH_SIZE_EXP)
