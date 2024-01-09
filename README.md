@@ -2,8 +2,9 @@ Benchmark code for the paper [Efficient Shapley Performance Attribution for Leas
 Regression](https://web.stanford.edu/~boyd/papers/ls_shapley.html) by Logan Bell,
 Nikhil Devanathan, and Stephen Boyd. This code was written with purely performance in mind. 
 A more elegant, easy-to-use (but slightly less performant) library implementation of the 
-reference paper can be found at [cvxgrp/ls-spa](https://web.stanford.edu/~boyd/papers/ls_shapley.html).
-We recommend using the library implementation.
+reference paper can be found at 
+[cvxgrp/ls-spa]([https://web.stanford.edu/~boyd/papers/ls_shapley.html](https://github.com/cvxgrp/ls-spa)).
+We recommend using the library implementaton.
 
 The code has the following dependencies:
 - `numpy`
