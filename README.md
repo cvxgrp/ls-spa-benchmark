@@ -1,6 +1,8 @@
 Benchmark code for the paper [Efficient Shapley Performance Attribution for Least-Squares
 Regression](https://web.stanford.edu/~boyd/papers/ls_shapley.html) by Logan Bell,
-Nikhil Devanathan, and Stephen Boyd.
+Nikhil Devanathan, and Stephen Boyd. A more elegant (but slightly less performant) library 
+implementation of the reference paper can be found at 
+[cvxgrp/ls-spa](https://web.stanford.edu/~boyd/papers/ls_shapley.html).
 
 The code has the following dependencies:
 - `numpy`
