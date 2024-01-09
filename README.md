@@ -22,6 +22,7 @@ to the root directory of the repository, and install the dependencies. Afterward
 two experiment files can be executed with Python. The medium experiment generates Figure 2
 in the companion paper, and the large experiment generates Figure 3 in the companion paper.
 
+If you use this code for research, please cite the associated paper.
 ```
 @misc{https://doi.org/10.48550/arxiv.2310.19245,
   doi = {10.48550/ARXIV.2310.19245},
