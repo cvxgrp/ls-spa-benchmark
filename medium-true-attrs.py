@@ -130,7 +130,7 @@ def create_lsspa(p, N, M, K, B, eps, D):
     @jit
     def error_estimate(key, i, cov_b):
         num_samples = (i+1) * B * D
-        cov = cov_b * num_samples / (num_samples - 1)
+        cov = cov_b / (num_samples - 1)
 
         key, err_key = random.split(key)
         sample_diffs = random.multivariate_normal(err_key, jnp.zeros(p), cov, shape=(2**12,), method="svd")
