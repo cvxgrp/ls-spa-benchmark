@@ -147,10 +147,7 @@ def create_lsspa(p, N, M, K, B, eps, D):
         return new_mean, new_cov
 
 
-    def lsspa(X_train, X_test, y_train, y_test, reg, key):
-        y_norm_sq = jnp.sum(y_test ** 2)
-        X_train_tilde, X_test_tilde, y_train_tilde, y_test_tilde = reduce_data(X_train, X_test, y_train, y_test, reg)
-
+    def lsspa(X_train, X_test, y_train, y_test, y_norm_sq, key):
         attrs = jnp.zeros(p)
         cov = jnp.zeros((p, p))
         err = jnp.inf
@@ -165,11 +162,11 @@ def create_lsspa(p, N, M, K, B, eps, D):
             key, err_key = random.split(key)
             err = error_estimate(err_key, i, cov)
 
-        theta = jnp.linalg.lstsq(X_train_tilde, y_train_tilde, rcond=None)[0]
-        r_squared = (jnp.sum(y_test_tilde ** 2) - jnp.sum((y_test_tilde - X_test_tilde @ theta) ** 2)) / y_norm_sq
+        theta = jnp.linalg.lstsq(X_train, y_train, rcond=None)[0]
+        r_squared = (jnp.sum(y_test ** 2) - jnp.sum((y_test - X_test @ theta) ** 2)) / y_norm_sq
         return attrs, err, theta, r_squared
 
-    return lsspa
+    return reduce_data, lsspa
 
 
 if __name__ == "__main__":
@@ -177,10 +174,10 @@ if __name__ == "__main__":
     N = int(1e5)
     M = int(1e5)
     K = int(2 ** 28)
-    B = int(2 ** 7)
+    B = int(2 ** 8)
     eps = 1e-4
     D = len(devices())
-    lsspa = create_lsspa(p, N, M, K, B, eps, D)
+    reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
 
     data_rng = np.random.default_rng(42)
     X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
@@ -190,10 +187,13 @@ if __name__ == "__main__":
     y_train = jnp.array(y_train)
     y_test = jnp.array(y_test)
     cov = jnp.array(cov)
+
+    y_norm_sq = jnp.sum(y_test ** 2)
+    X_train, X_test, y_train, y_test = reduce_data(X_train, X_test, y_train, y_test, 0.0)
     gt_key = random.key(0)
 
     attrs, err, theta, r_squared = lsspa(X_train, X_test, y_train, y_test,
-                                         0.0, gt_key)
+                                         y_norm_sq, gt_key)
     print(f"The estimated error is {err}.")
     attrs_np = np.array(attrs)
     np.save("gt_Medium.npy", attrs_np)
