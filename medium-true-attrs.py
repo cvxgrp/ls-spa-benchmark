@@ -177,7 +177,7 @@ if __name__ == "__main__":
     N = int(1e5)
     M = int(1e5)
     K = int(2 ** 28)
-    B = int(2 ** 13)
+    B = int(2 ** 10)
     eps = 1e-4
     D = len(devices())
     lsspa = create_lsspa(p, N, M, K, B, eps, D)
