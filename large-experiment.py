@@ -199,7 +199,7 @@ if __name__ == "__main__":
     N = int(1e6)
     M = int(1e6)
     K = int(2 ** 28)
-    B = int(2 ** 8)
+    B = int(2 ** 7)
     eps = 1e-2
     D = len(devices())
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
@@ -212,6 +212,10 @@ if __name__ == "__main__":
     y_norm_sq = np.sum(y_test ** 2)
     red_start = time.time()
     X_train, X_test, y_train, y_test = reduce_data(X_train, X_test, y_train, y_test, 0.0)
+    X_train = device_put(X_train, devices()[0])
+    y_train = device_put(y_train, devices()[0])
+    X_test = device_put(X_test, devices()[0])
+    y_test = device_put(y_test, devices()[0])
     red_end = time.time()
 
     print(f"Data reduction completed, took {red_end - red_start} seconds.")
