@@ -62,24 +62,15 @@ def gen_data(rng, conditioning=20, stn_ratio=5):
 
 def create_lsspa(p, N, M, K, B, eps, D):
     def reduce_data(X_train, X_test, y_train, y_test, reg):
-        X_train = X_train / np.sqrt(N)
-        X_train = np.vstack((X_train, np.sqrt(reg) * np.eye(p)))
-        y_train = y_train / np.sqrt(N)
-        y_train = np.concatenate((y_train, np.zeros(p)))
+        X_train = X_train / jnp.sqrt(N)
+        X_train = jnp.vstack((X_train, jnp.sqrt(reg) * jnp.eye(p)))
+        y_train = y_train / jnp.sqrt(N)
+        y_train = jnp.concatenate((y_train, jnp.zeros(p)))
 
-        sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
-        cat_train = device_put(jnp.concatenate((X_train, y_train[:, None])),
-                               sharding)
-        gram_train = jnp.dot(cat_train.T, cat_train)
-        R_train = jsp.linalg.cholesky(gram_train)
-        X_train_tilde, y_train_tilde = R_train[:-1, :-1], R_train[:-1, -1]
-
-        cat_test = device_put(jnp.concatenate((X_test, y_test[:, None])),
-                              sharding)
-        gram_test = jnp.dot(cat_test.T, cat_test)
-        R_test = jsp.linalg.cholesky(gram_test)
-        X_test_tilde, y_test_tilde = R_test[:-1, :-1], R_test[:-1, -1]
-
+        Q, X_train_tilde = jnp.linalg.qr(X_train)
+        Q_ts, X_test_tilde = jnp.linalg.qr(X_test)
+        y_train_tilde = Q.T @ y_train
+        y_test_tilde = Q_ts.T @ y_test
         return X_train_tilde, X_test_tilde, y_train_tilde, y_test_tilde
 
 
@@ -208,7 +199,12 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
 
     y_norm_sq = np.sum(y_test ** 2)
+    sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
     red_start = time.time()
+    X_train = device_put(jnp.array(X_train), sharding)
+    y_train = device_put(jnp.array(y_train), sharding)
+    X_test = device_put(jnp.array(X_test), sharding)
+    y_test = device_put(jnp.array(y_test), sharding)
     X_train, X_test, y_train, y_test = reduce_data(X_train, X_test, y_train, y_test, 0.0)
     red_end = time.time()
 
