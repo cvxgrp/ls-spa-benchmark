@@ -67,15 +67,12 @@ def create_lsspa(p, N, M, K, B, eps, D):
         y_train = y_train / np.sqrt(N)
         y_train = np.concatenate((y_train, np.zeros(p)))
 
-        sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
-        cat_train = device_put(jnp.hstack((X_train, y_train[:, None])),
-                               sharding)
+        cat_train = jnp.hstack((X_train, y_train[:, None]))
         gram_train = jnp.dot(cat_train.T, cat_train)
         R_train = jsp.linalg.cholesky(gram_train)
         X_train_tilde, y_train_tilde = R_train[:-1, :-1], R_train[:-1, -1]
 
-        cat_test = device_put(jnp.hstack((X_test, y_test[:, None])),
-                              sharding)
+        cat_test = jnp.hstack((X_test, y_test[:, None]))
         gram_test = jnp.dot(cat_test.T, cat_test)
         R_test = jsp.linalg.cholesky(gram_test)
         X_test_tilde, y_test_tilde = R_test[:-1, :-1], R_test[:-1, -1]
@@ -193,6 +190,13 @@ def create_lsspa(p, N, M, K, B, eps, D):
 
     return reduce_data, lsspa
 
+sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
+
+@partial(jit, static_argnums=(0,), out_shardings=sharding)
+def load_data(filename):
+    data = jnp.load(filename)
+    return data
+
 
 if __name__ == "__main__":
     p = 1000
@@ -207,9 +211,18 @@ if __name__ == "__main__":
     data_rng = np.random.default_rng(42)
     print("Generating data...")
     X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
+    y_norm_sq = np.sum(y_test ** 2)
+
+    np.save("temp_X_train.npy", X_train)
+    np.save("temp_y_train.npy", y_train)
+    np.save("temp_X_test.npy", X_test)
+    np.save("temp_y_test.npy", y_test)
+    X_train = load_data("temp_X_train.npy")
+    y_train = load_data("temp_y_train.npy")
+    X_test = load_data("temp_X_test.npy")
+    y_test = load_data("temp_y_test.npy")
     print("Data generated.")
 
-    y_norm_sq = np.sum(y_test ** 2)
     red_start = time.time()
     X_train, X_test, y_train, y_test = reduce_data(X_train, X_test, y_train, y_test, 0.0)
     X_train = device_put(X_train, devices()[0])
