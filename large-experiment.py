@@ -190,13 +190,6 @@ def create_lsspa(p, N, M, K, B, eps, D):
 
     return reduce_data, lsspa
 
-sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
-
-@partial(jit, static_argnums=(0,), out_shardings=sharding)
-def load_data(filename):
-    data = jnp.load(filename)
-    return data
-
 
 if __name__ == "__main__":
     p = 1000
@@ -207,6 +200,13 @@ if __name__ == "__main__":
     eps = 1e-2
     D = len(devices())
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
+
+    sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
+
+    @partial(jit, static_argnums=(0,), out_shardings=sharding)
+    def load_data(filename):
+        data = jnp.load(filename)
+        return data
 
     data_rng = np.random.default_rng(42)
     print("Generating data...")
