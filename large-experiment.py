@@ -203,15 +203,18 @@ if __name__ == "__main__":
     M = int(1e6)
     K = int(2 ** 28)
     B = int(2 ** 7)
-    eps = 1e-2
+    eps = 1e-3
     D = len(devices())
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
 
     data_rng = np.random.default_rng(42)
     print("Generating data...")
-    X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=100, stn_ratio=5)
+    X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
     y_norm_sq = np.sum(y_test ** 2)
+    theta_hat = np.linalg.lstsq(X_train, y_train, rcond=None)[0]
+    correct_r_squared = 1 - np.sum((X_test @ theta_hat - y_test)**2) / np.sum(y_test**2)
     print("Data generated.")
+    print(f"Correct R squared is {correct_r_squared}.")
 
     red_start = time.time()
     X_train, X_test, y_train, y_test = reduce_data(X_train, X_test, y_train, y_test, 0.0)
@@ -229,3 +232,5 @@ if __name__ == "__main__":
     print(f"LSSPA completed, took {lsspa_end - lsspa_start} seconds.")
     print(f"Total time: {lsspa_end - lsspa_start + red_end - red_start} seconds.")
     print(f"The estimated error is {err}.")
+    print(f"LSSPA returned R squared {r_squared}.")
+    print(f"Attributions sum to {jnp.sum(attrs)}")
