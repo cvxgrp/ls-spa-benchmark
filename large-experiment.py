@@ -203,7 +203,7 @@ if __name__ == "__main__":
     M = int(1e6)
     K = int(2 ** 28)
     B = int(2 ** 7)
-    eps = 1e-3
+    eps = 1e-2
     D = len(devices())
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
 
