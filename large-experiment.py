@@ -67,13 +67,19 @@ def create_lsspa(p, N, M, K, B, eps, D):
         y_train = y_train / np.sqrt(N)
         y_train = np.concatenate((y_train, np.zeros(p)))
 
-        cat_train = jnp.hstack((X_train, y_train[:, None]))
-        gram_train = jnp.dot(cat_train.T, cat_train)
+        cat_train = np.hstack((X_train, y_train[:, None]))
+        cat_train_partitioned = np.array_split(cat_train, D)
+        cat_train_partitioned = [device_put(jnp.asarray(block), devices()[i])
+        for i, block in enumerate(cat_train_partitioned)]
+        gram_train = jnp.sum(jnp.asarray([device_put(jnp.dot(block.T, block), devices()[0]) for block in cat_train_partitioned]))
         R_train = jsp.linalg.cholesky(gram_train)
         X_train_tilde, y_train_tilde = R_train[:-1, :-1], R_train[:-1, -1]
 
-        cat_test = jnp.hstack((X_test, y_test[:, None]))
-        gram_test = jnp.dot(cat_test.T, cat_test)
+        cat_test = np.hstack((X_test, y_test[:, None]))
+        cat_test_partitioned = np.array_split(cat_test, D)
+        cat_test_partitioned = [device_put(jnp.asarray(block), devices()[i])
+        for i, block in enumerate(cat_test_partitioned)]
+        gram_test = jnp.sum(jnp.asarray([device_put(jnp.dot(block.T, block), devices()[0]) for block in cat_test_partitioned]))
         R_test = jsp.linalg.cholesky(gram_test)
         X_test_tilde, y_test_tilde = R_test[:-1, :-1], R_test[:-1, -1]
 
@@ -201,34 +207,14 @@ if __name__ == "__main__":
     D = len(devices())
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
 
-    sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
-
-    @partial(jit, static_argnums=(0,), out_shardings=sharding)
-    def load_data(filename):
-        data = jnp.load(filename)
-        return data
-
     data_rng = np.random.default_rng(42)
     print("Generating data...")
     X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
     y_norm_sq = np.sum(y_test ** 2)
-
-    np.save("temp_X_train.npy", X_train)
-    np.save("temp_y_train.npy", y_train)
-    np.save("temp_X_test.npy", X_test)
-    np.save("temp_y_test.npy", y_test)
-    X_train = load_data("temp_X_train.npy")
-    y_train = load_data("temp_y_train.npy")
-    X_test = load_data("temp_X_test.npy")
-    y_test = load_data("temp_y_test.npy")
     print("Data generated.")
 
     red_start = time.time()
     X_train, X_test, y_train, y_test = reduce_data(X_train, X_test, y_train, y_test, 0.0)
-    X_train = device_put(X_train, devices()[0])
-    y_train = device_put(y_train, devices()[0])
-    X_test = device_put(X_test, devices()[0])
-    y_test = device_put(y_test, devices()[0])
     red_end = time.time()
 
     print(f"Data reduction completed, took {red_end - red_start} seconds.")
