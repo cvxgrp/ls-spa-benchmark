@@ -71,7 +71,7 @@ def create_lsspa(p, N, M, K, B, eps, D):
         cat_train_partitioned = np.array_split(cat_train, D)
         cat_train_partitioned = [device_put(jnp.asarray(block), devices()[i])
         for i, block in enumerate(cat_train_partitioned)]
-        gram_train = jnp.sum(jnp.asarray([device_put(jnp.dot(block.T, block), devices()[0]) for block in cat_train_partitioned]))
+        gram_train = jnp.sum(jnp.asarray([device_put(jnp.dot(block.T, block), devices()[0]) for block in cat_train_partitioned]), axis=0)
         R_train = jsp.linalg.cholesky(gram_train)
         X_train_tilde, y_train_tilde = R_train[:-1, :-1], R_train[:-1, -1]
 
@@ -79,7 +79,7 @@ def create_lsspa(p, N, M, K, B, eps, D):
         cat_test_partitioned = np.array_split(cat_test, D)
         cat_test_partitioned = [device_put(jnp.asarray(block), devices()[i])
         for i, block in enumerate(cat_test_partitioned)]
-        gram_test = jnp.sum(jnp.asarray([device_put(jnp.dot(block.T, block), devices()[0]) for block in cat_test_partitioned]))
+        gram_test = jnp.sum(jnp.asarray([device_put(jnp.dot(block.T, block), devices()[0]) for block in cat_test_partitioned]), axis=0)
         R_test = jsp.linalg.cholesky(gram_test)
         X_test_tilde, y_test_tilde = R_test[:-1, :-1], R_test[:-1, -1]
 
