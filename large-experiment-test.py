@@ -196,7 +196,9 @@ if __name__ == "__main__":
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
 
     data_rng = np.random.default_rng(42)
+    print("Generating data...")
     X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
+    print("Data generated.")
 
     y_norm_sq = np.sum(y_test ** 2)
     sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))

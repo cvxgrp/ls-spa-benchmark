@@ -68,13 +68,13 @@ def create_lsspa(p, N, M, K, B, eps, D):
         y_train = np.concatenate((y_train, np.zeros(p)))
 
         sharding = PositionalSharding(mesh_utils.create_device_mesh((D, 1)))
-        cat_train = device_put(jnp.concatenate((X_train, y_train[:, None])),
+        cat_train = device_put(jnp.hstack((X_train, y_train[:, None])),
                                sharding)
         gram_train = jnp.dot(cat_train.T, cat_train)
         R_train = jsp.linalg.cholesky(gram_train)
         X_train_tilde, y_train_tilde = R_train[:-1, :-1], R_train[:-1, -1]
 
-        cat_test = device_put(jnp.concatenate((X_test, y_test[:, None])),
+        cat_test = device_put(jnp.hstack((X_test, y_test[:, None])),
                               sharding)
         gram_test = jnp.dot(cat_test.T, cat_test)
         R_test = jsp.linalg.cholesky(gram_test)
@@ -205,7 +205,9 @@ if __name__ == "__main__":
     reduce_data, lsspa = create_lsspa(p, N, M, K, B, eps, D)
 
     data_rng = np.random.default_rng(42)
+    print("Generating data...")
     X_train, X_test, y_train, y_test, true_theta, cov = gen_data(data_rng, conditioning=20, stn_ratio=5)
+    print("Data generated.")
 
     y_norm_sq = np.sum(y_test ** 2)
     red_start = time.time()
