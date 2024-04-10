@@ -221,8 +221,8 @@ if __name__ == "__main__":
     red_end = time.time()
 
     print(f"Data reduction completed, took {red_end - red_start} seconds.")
-    print(f"Condition Number of X_train covariance is {jnp.linalg.cond(X_train)}")
-    print(f"Condition Number of X_test covariance is {jnp.linalg.cond(X_test)}")
+    print(f"Condition Number of X_train covariance is {jnp.linalg.cond(cov)}")
+    print(f"Condition Number of X_test covariance is {jnp.linalg.cond(cov)}")
 
     key = random.key(0)
     lsspa_start = time.time()
