@@ -24,14 +24,17 @@ in the companion paper, and the large experiment generates Figure 3 in the compa
 
 If you use this code for research, please cite the associated paper.
 ```
-@misc{https://doi.org/10.48550/arxiv.2310.19245,
-  doi = {10.48550/ARXIV.2310.19245},
-  url = {https://arxiv.org/abs/2310.19245},
+@article{Bell2024,
+  title = {Efficient Shapley performance attribution for least-squares regression},
+  volume = {34},
+  ISSN = {1573-1375},
+  url = {http://dx.doi.org/10.1007/s11222-024-10459-9},
+  DOI = {10.1007/s11222-024-10459-9},
+  number = {5},
+  journal = {Statistics and Computing},
+  publisher = {Springer Science and Business Media LLC},
   author = {Bell,  Logan and Devanathan,  Nikhil and Boyd,  Stephen},
-  keywords = {Computation (stat.CO),  FOS: Computer and information sciences,  FOS: Computer and information sciences,  62-08 (Primary),  62-04,  62J99 (Secondary)},
-  title = {Efficient Shapley Performance Attribution for Least-Squares Regression},
-  publisher = {arXiv},
-  year = {2023},
-  copyright = {arXiv.org perpetual,  non-exclusive license}
+  year = {2024},
+  month = jul 
 }
 ```
