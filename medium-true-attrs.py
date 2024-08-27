@@ -196,4 +196,4 @@ if __name__ == "__main__":
                                          y_norm_sq, gt_key)
     print(f"The estimated error is {err}.")
     attrs_np = np.array(attrs)
-    np.save("gt_Medium.npy", attrs_np)
+    np.save("./data/gt_Medium.npy", attrs_np)
