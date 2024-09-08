@@ -26,7 +26,7 @@ two experiment files can be executed with Python. The medium experiment generate
 in the companion paper, and the large experiment generates Figure 3 in the companion paper.
 
 If you use this code for research, please cite the associated paper.
-```
+```bibtex
 @article{Bell2024,
   title = {Efficient Shapley performance attribution for least-squares regression},
   volume = {34},
