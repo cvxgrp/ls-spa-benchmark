@@ -12,6 +12,9 @@ The code has the following dependencies:
 - `jax`
 - `matplotlib`
 
+In addition, the medium experiment requires the library implementation of `ls_spa`
+found at [cvxgrp/ls-spa](https://github.com/cvxgrp/ls-spa).
+
 JAX is a dependency of `ls_spa`, but its installation varies by platform (do not try to 
 blindly `pip install jax`). Follow 
 [these instructions](https://github.com/google/jax#installation) to correctly install JAX.
