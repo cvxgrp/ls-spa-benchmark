@@ -20,10 +20,8 @@ blindly `pip install jax`). Follow
 [these instructions](https://github.com/google/jax#installation) to correctly install JAX.
 The other packages are safely `pip` installable.
 
-To run the benchmark code, clone this repository, add an empty directory called `plots`
-to the root directory of the repository, and install the dependencies. Afterwards, the 
-two experiment files can be executed with Python. The medium experiment generates Figure 2
-in the companion paper, and the large experiment generates Figure 3 in the companion paper.
+To run the benchmark code, clone this repository and install the dependencies. Afterwards, 
+the two experiment files can be executed with Python.
 
 If you use this code for research, please cite the associated paper.
 
